@@ -87,7 +87,7 @@ const handleSubmit = async(e) => {
 
   const data = new FormData(form);
 
-  if (data.get('prompt') && data.get('prompt') === "")
+  if (data.get('prompt') === "")
     return;
   
   chatContainer.innerHTML += chatStript(false, data.get('prompt'));
