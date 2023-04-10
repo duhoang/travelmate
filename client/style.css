@@ -90,8 +90,7 @@ body {
   background: rgba(220, 220, 220, 0);
   border-radius: 16px;
   padding: 4px;
-  text-shadow: 1px 1px 0 #fff;
-  text-shadow: -1px -1px 0 #fff;
+  text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, -1px 1px 0 #fff, 1px -1px 0 #fff;
 
   color:#60D989;
 }
