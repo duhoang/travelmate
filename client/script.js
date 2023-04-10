@@ -146,8 +146,10 @@ const generateImage = async(e) => {
 
   document.getElementById('loading_gif').style.display = "block";
 
-  if (persona[0] && persona[0].value && persona[0].value === "") 
+  if (persona[0].value === "") 
     persona[0].value = INIT_IMAGE;
+
+    console.log("test");
 
   const response = await fetch('https://friendly-ai.onrender.com', {
   //const response = await fetch('http://localhost:4000/images', {
@@ -162,6 +164,8 @@ const generateImage = async(e) => {
 
   if (response.ok) {
     const data = await response.json();
+
+    console.log(data);
 
     document.getElementById('loading_gif').style.display = "none";
 
