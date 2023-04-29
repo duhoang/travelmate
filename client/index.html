@@ -7,21 +7,35 @@
     <title>Friendly AI</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@300&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:wght@700&family=Lilita+One&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
+    
+    <script type="module" src="/script.js"></script>
   </head>
   <body>
     <div id="app">
-      <div id="title">Friendly.AI by Du Hoang</div>
-      <div id="loading_gif"></div>
-      <div id="chat_container"></div>
-      <form>
-        <textarea id="prompt" name="prompt" rows="1" cols="1" placeholder="Message..."></textarea>
-        <button type="submit"><img src="assets/send.svg" /></button>
-        <input type="text" name="persona" placeholder="Persona..." />
-      </form>
+      <div id="cover">
+        <div class="page">
+          <div id="title"><span>Create</span><span id="a_title">a</span><span>Story</span></div>
+          <div class="img_container">
+            <div class="loading_gif"></div>
+          </div>
+        </div>
+        <div class="page">
+          <form>
+            <label>Story Summary</label>
+            <textarea id="prompt" name="prompt" rows="1" cols="1" ></textarea>
+            <label>Illustration Style</label>
+            <textarea id="artstyle" name="artstyle" rows="1" cols="1" ></textarea>
+            <button type="submit">Go →</button>
+            <div class="loading_gif"></div>
+          </form>
+          
+        </div>
+      </div>
+      <div id="book">
+        
+      </div>
     </div>
-
-    <script type="module" src="/script.js"></script>
   </body>
 </html>

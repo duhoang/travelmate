@@ -1,181 +1,204 @@
-import bot from './assets/bot.svg';
-import user from './assets/user.svg';
+import storyText from './assets/sample_story';
 
 const form = document.querySelector('form');
-const chatContainer = document.querySelector('#chat_container');
+const cover = document.querySelector('#cover')
+const book = document.querySelector('#book');
+const storySummary = document.querySelector('#prompt');
+const artStyle = document.querySelector('#artstyle');
+let paragraphs = [];
 
-let loadInterval;
+const EX_STORY = "There was a bunny name Fred. Who lives on a farm and goes on adventures with his barnyard friends.";
 
-const INIT_IMAGE = "teen gohan, anime, dragonball z";
+const EX_ARTSTYLE = "Children's illustration, cartoony, colorful";
 
-const imagePromptBase = {
-  position: ' upper body, centered',
-  expressions: {
-    wave: ' waving, smilling,',
-    thinking: 'hand on chin, eyebrow raised',
-    talking: 'talking, open mouth',
-    contemplating: 'crossed-arm, heads down, squinty eyes',
-  }
-};
+storySummary.placeholder = `Ex. ${EX_STORY}`;
+artStyle.placeholder = `Ex. ${EX_ARTSTYLE}`;
 
-const EXPRESSIONS = ["thinking", "talking", "contemplating"];
-
-let imagePrompt = `${imagePromptBase.expressions.wave}, ${imagePromptBase.position}`;
-
-function loader(element) {
-  element.textContent = '';
-
-  loadInterval = setInterval(() => {
-    element.textContent += '.';
-
-    if (element.textContent === '....') {
-      element.textContent = '';
-    }
-
-  }, 300)
-}
-
-function typeText(element, text) {
-  let index = 0;
-
-  let interval = setInterval(() => {
-    if (index < text.length) {
-      element.innerHTML += text.charAt(index);
-      index++;
-    } else {
-      clearInterval(interval);
-    }
-  }, 20)
-}
-
-function generateUniqueID(){
-  const timestamp = Date.now();
-  const randomNumber = Math.random();
-  const hexadecimalString = randomNumber.toString(16);
-
-  return `id-${timestamp}-${hexadecimalString}`;
-}
-
-function chatStript(isAi, value, uniqueId){
-  return (
-    `
-      <div class="wrapper ${isAi && 'ai'}">
-        <div class="chat">
-          <div class="profile">
-            <img
-              src="${isAi ? bot : user}"
-              alt="${isAi ? 'bot' : 'user'}"
-            />
-          </div>
-          <div class="message" id=${uniqueId}>${value}</div>
-        </div>
-      </div>
-    `
-  )
-}
-
-const handleSubmit = async(e) => {
-  e.preventDefault();
-
-  const expression = EXPRESSIONS[Math.floor(Math.random()*EXPRESSIONS.length)];
-
-  imagePrompt = `${expression}, ${imagePromptBase.position}`;
-
-  console.log(imagePrompt);
-
-  generateImage();
-
+const generatePreview = async(e) => {
+  
   const data = new FormData(form);
 
-  if (data.get('prompt') === "")
-    return;
-  
-  chatContainer.innerHTML += chatStript(false, data.get('prompt'));
+  if (data.get('prompt') === "") 
+    storySummary.placeholder = `Ex. ${EX_STORY}`;
 
-  document.getElementById("prompt").value = "";
+  if (data.get('artstyle') === "")
+    artStyle.placeholder = `Ex. ${EX_ARTSTYLE}`;
 
-  const uniqueId = generateUniqueID();
+  const promptString = `Describe the cover illustration of the following story: ${data.get('prompt') || EX_STORY}`;
 
-  chatContainer.innerHTML += chatStript(true, " ", uniqueId);
 
-  chatContainer.scrollTop = chatContainer.scrollHeight;
-
-  const messageDiv = document.getElementById(uniqueId);
-
-  loader(messageDiv);
-
-  const response = await fetch('https://friendly-ai.onrender.com', {
-  //const response = await fetch('http://localhost:4000', {
+  //const response = await fetch('https://friendly-ai.onrender.com', {
+  const response = await fetch('http://localhost:4000', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      prompt: data.get('prompt')
+      prompt: promptString
     })
   })
 
-  clearInterval(loadInterval);
-  messageDiv.innerHTML = '';
+  if (response.ok) {
+    const data = await response.json();
+    const parsedData = data.bot.trim();
+    generateIllustration(parsedData, cover);
+  } else {
+    const err = await response.text();
+    console.log(err);
+  }
+}
+
+const handleSubmit = async(e) => {
+  e.preventDefault();
+  const data = new FormData(form);
+
+  if (data.get('prompt') === "")
+    return;
+
+
+  form.classList.add("disabled");
+  
+  const storyPrompt = `write a short children story about ${data.get('prompt')}`;
+
+  //const response = await fetch('https://friendly-ai.onrender.com', {
+  const response = await fetch('http://localhost:4000', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      prompt: storyPrompt
+    })
+  })
+
 
   if (response.ok) {
     const data = await response.json();
     const parsedData = data.bot.trim();
 
-    typeText(messageDiv, parsedData);
+    parseIntoBook(parsedData);
+
+    form.classList.remove("disabled");
   } else {
     const err = await response.text();
-
-    messageDiv.innerHTML = "Something went wrong";
+    form.classList.remove("disabled");
   }
-
-  
- 
-  
 }
 
 form.addEventListener('submit', handleSubmit);
 form.addEventListener('keyup', (e)=>{
   if (e.keyCode === 13) {
-    handleSubmit(e);
+    //generatePreview();
   }
 })
 
-const generateImage = async(e) => {
-  const persona = document.getElementsByName("persona");
+const generateIllustration = async(desc, elm) => {
 
-  document.getElementById('loading_gif').style.display = "block";
+  const prompt = `Create an illustration in the style of ${artStyle.value || EX_ARTSTYLE} without text, of this description: ${desc}`;
 
-  if (persona[0].value === "") 
-    persona[0].value = INIT_IMAGE;
-
-
-  const response = await fetch('https://friendly-ai.onrender.com/images', {
-  //const response = await fetch('http://localhost:4000/images', {
+  //const response = await fetch('https://friendly-ai.onrender.com/images', {
+  const response = await fetch('http://localhost:4000/images', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      prompt: `${persona[0].value}, ${imagePrompt}`,
+      prompt: prompt,
     })
   })
 
   if (response.ok) {
+    
     const data = await response.json();
 
-    document.getElementById('loading_gif').style.display = "none";
+    elm.getElementsByClassName('loading_gif')[0].style.display = "none";
 
-    document.getElementById('app').style.backgroundImage=`url(${data.image.data[0].url})`;
+    elm.getElementsByClassName('img_container')[0].style.backgroundImage=`url(${data.image.data[0].url})`;
+   
 
   } else {
     const err = await response.text();
-
-    console.log(err);
-
   }
 }
 
-generateImage();
+const parseIntoBook = (txt) => {
+  paragraphs = txt.split('\n\n');
+  console.log(paragraphs);
+  createBook(paragraphs);
+}
 
+const createBook = (paragraphs) => {
+ 
+  book.innerHTML = "";
 
+  const maxlength = paragraphs.length;
+  
+  for (let i = 0; i < maxlength; i++) {
+    book.innerHTML += createSpread(paragraphs[i], i, maxlength);
+  }
+  const nextBtns = document.getElementsByClassName("nav_btn");
+
+  [].forEach.call(nextBtns, (elm) => {
+    elm.addEventListener("click", onClickNav);
+  });
+
+  showSpread("0");
+}
+
+const createSpread = (txt, index, maxlength) => {
+  return (
+    `
+      <div class="spread" data-index="${index}">
+        <div class="page">
+            <div class="text_container">
+              ${txt}
+            </div>
+            ${getBackButton(index)}
+          </div>
+          <div class="page">
+              <div class="img_container">
+                <div class="loading_gif"></div>
+              </div>
+
+            ${getNextButton(index, maxlength)}
+          </div>
+      </div>
+    `
+  )
+}
+
+const getBackButton = (index) => {
+  if (index <= 0 ) return "";
+  return `<div class="back_btn nav_btn" data-index="${index-1}">← Back</div>`;
+}
+
+const getNextButton = (index, maxlength) => {
+  if (index == maxlength - 1)
+    return `<div class="next_btn nav_btn" data-index="${-1}">Retry</div>`;
+  return `<div class="next_btn nav_btn" data-index="${index+1}">Next →</div>`;
+}
+
+const onClickNav = (ev) => {
+  showSpread(ev.target.getAttribute("data-index"));
+}
+
+const showSpread = (index) => {
+
+  if (index==="-1") {
+    book.innerHTML = "";
+    form.classList.remove("disabled");
+  };
+
+  const spreads = document.getElementsByClassName("spread");
+
+  [].forEach.call(spreads, (elm) => {
+    elm.style.display = parseInt(elm.getAttribute("data-index")) <= parseInt(index) ? "flex" : "none";
+
+    if (elm.getAttribute("data-index") === index) {
+      generateIllustration(paragraphs[index], elm);
+    }
+  })
+  
+}
+
+generatePreview();
