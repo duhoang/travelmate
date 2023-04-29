@@ -27,8 +27,8 @@ const generatePreview = async(e) => {
   const promptString = `Describe the cover illustration of the following story: ${data.get('prompt') || EX_STORY}`;
 
 
-  //const response = await fetch('https://friendly-ai.onrender.com', {
-  const response = await fetch('http://localhost:4000', {
+  const response = await fetch('https://create-a-story.onrender.com', {
+  //const response = await fetch('http://localhost:4000', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -60,8 +60,8 @@ const handleSubmit = async(e) => {
   
   const storyPrompt = `write a short children story about ${data.get('prompt')}`;
 
-  //const response = await fetch('https://friendly-ai.onrender.com', {
-  const response = await fetch('http://localhost:4000', {
+  const response = await fetch('https://create-a-story.onrender.com', {
+  //const response = await fetch('http://localhost:4000', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -96,8 +96,8 @@ const generateIllustration = async(desc, elm) => {
 
   const prompt = `Create an illustration in the style of ${artStyle.value || EX_ARTSTYLE} without text, of this description: ${desc}`;
 
-  //const response = await fetch('https://friendly-ai.onrender.com/images', {
-  const response = await fetch('http://localhost:4000/images', {
+  const response = await fetch('https://create-a-story.onrender.com/images', {
+  //const response = await fetch('http://localhost:4000/images', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
