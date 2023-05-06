@@ -4,17 +4,20 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family:'Lilita One', sans-serif;
 }
 
 body {
   background: #fff;
+  font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  color: #2F2E32;
 }
 
 #app {
   width: 100vw;
   height: 100vh;
-  text-shadow: -1px -1px 0 white, 1px 1px 0 white, -1px 1px 0 white, 1px -1px white;
+  overflow: hidden;
+  text-shadow: 3px 1px 0 white, 1px 3px 0 white, -3px 1px 0 white, 1px -3px 0 white, 3px 0 0 white, 0 3px 0 white, -3px 0 0 white, 0 -3px 0 white, -2px -1px 0 white, 2px 1px 0 white, -2px 1px 0 white, 2px -1px white, -1px -2px 0 white, 1px 2px 0 white, -1px 2px 0 white, 1px -2px white, -2px -2px 0 white, 2px 2px 0 white, -2px 2px 0 white, 2px -2px white;
+  font-family: 'Sigmar', -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 
 #book {
@@ -25,6 +28,41 @@ body {
   left: 0;
   pointer-events: none;
 }
+
+#book.hide-book {
+  overflow: hidden;
+}
+
+#book.hide-book .spread {
+  transform: translateX(125%);
+  transition: transform 1.5s;
+  box-shadow: 0 0 8px rgba(0,0,0,.3);
+}
+
+#book.hide-book .spread:nth-child(2) {
+  transition: transform 1.4s;
+}
+
+#book.hide-book .spread:nth-child(3) {
+  transition: transform 1.30s;
+}
+
+#book.hide-book .spread:nth-child(4) {
+  transition: transform 1.2s;
+}
+
+#book.hide-book .spread:nth-child(5) {
+  transition: transform 1s;
+}
+
+#book.hide-book .spread:nth-child(6) {
+  transition: transform .9s;
+}
+
+#book.hide-book .spread:nth-child(7) {
+  transition: transform .8s;
+}
+
 
 #cover {
   width: 100%;
@@ -50,13 +88,13 @@ body {
 .nav_btn {
   position: absolute;
   cursor: pointer;
-  color: orange;
-  font-size: 48px;
+  color: #FF9737;
+  font-size: 40px;
   bottom: 16px;
 }
 
 .nav_btn:hover {
-  color: red;
+  color: #F83B21;
 }
 
 .next_btn {
@@ -73,7 +111,8 @@ body {
   width: 50%;
   height: 100%;
   position: relative;
-  background-color: white;
+  z-index: 1;
+  background: white;
 }
 
 .page:before {
@@ -85,8 +124,9 @@ body {
   background: linear-gradient(90deg, rgba(0,0,0,.3) 0%, rgba(0,0,0,0) 100%);
   content: "";
   pointer-events: none;
-  z-index: 1;
+  z-index: 3;
 }
+
 
 .page:nth-child(1):before {
   right: 0;
@@ -98,7 +138,6 @@ body {
   animation: flipPage 3s;
   transform-origin: center right;
   background: white;
-  z-index: 1;
   box-shadow: -5px 0 25px rgba(0, 0, 0, .5);
 }
 
@@ -112,83 +151,138 @@ body {
   content: "";
   pointer-events: none;
   z-index: 3;
-  background: white;
 }
 
 @keyframes flipPage {
-  from {
+  0% {
     transform: rotateY(150deg);
+    z-index: 2;
   }
-  to {
+  25% {
+    z-index: 2;
+  }
+  100% {
     transform: rotateY(0deg);
+    z-index: 1;
   }
 }
 
 @keyframes hidePage {
   0% {
     width: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,1) 75%, rgb(128, 128, 128, 1) 100%);
   }
   20% {
     width: 100%;
+    background: linear-gradient(90deg, rgba(255,255,255,1) 50%, rgb(128, 128, 128, 1) 100%);
   }
   25% {
     width: 0%;
+    background: linear-gradient(90deg, rgba(255,255,255,1) 25%, rgb(128, 128, 128, 1) 100%);
+  }
+  50% {
+    background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgb(128, 128, 128, 1) 100%);
   }
   100% {
     width: 0%;
+    background: linear-gradient(90deg, rgba(128,128,128,1) 0%, rgb(128, 128, 128, 1) 100%);
   }
 }
 
 .loading_gif {
   position: absolute;
   z-index: 1;
-  top: 0;
-  left: 0;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-50%);
+  pointer-events: none;
+  width: 64px;
+  height: 64px;
+}
+
+.loading_gif:after {
+  position: absolute;
+  width: 24px;
+  height: 24px;
+  background-image: url(./assets/pencil.svg);
+  content: "";
+  right: -22px;
+  animation: Pencil .5s infinite linear;
+}
+
+.loading_gif::before {
+  position: absolute;
+  content: "";
+  background: url(./assets/swiggle.svg) 0 center;
+  background-size: 64px 64px;
   width: 100%;
   height: 100%;
-  background: url(./assets/loading.gif) no-repeat center center;
-  background-size: 32px 32px;
-  pointer-events: none;
+  left: 0;
+  top: 0;
+  animation: Swiggling 1s infinite linear;
+  -webkit-mask-image: linear-gradient(90deg, transparent, black);
+  mask-image: linear-gradient (90deg, transparent, black);
+}
+
+@keyframes Swiggling {
+  0% {
+    background-position-x: 0;
+  }
+  100% {
+    background-position-x: -64px;
+  }
+}
+
+@keyframes Pencil {
+  0% {
+    transform: translateY(50%);
+  }
+  25% {
+    transform: translateY(75%);
+  }
+  75% {
+    transform: translateY(25%);
+  }
+  100% {
+    transform: translateY(50%);
+  }
 }
 
 #title {
   position: absolute;
   top: 16%;
   left: 50%;
-  font-size: 48px;
-  color: orange;
+  font-size: 40px;
+  color: #FF9737;
   z-index: 1;
   transform: translateX(-50%);
   text-align: center;
 }
 
-#title span {
-  font-family:'Lilita One' !important;
-}
 
 #a_title {
-  font-size: 80px;
   position: relative;
-  width: 80px;
-  height: 80px;
+  line-height: 44px;
+  width: 48px;
+  height: 48px;
   display: inline-block;
   margin: 0;
+  background: #F83B21;
+  border-radius: 100%;
+  text-shadow: none;
+  color: white;
+  margin: 0 8px;
+  border: 3px solid white;
+  box-sizing: content-box;
 }
 
-#a_title:after {
-  content: "";
-  width: 64px;
-  height: 64px;
-  border: 8px solid red;
-  display: block;
-  position: absolute;
-  border-radius: 100%;
-  border-bottom-color: transparent;
-  border-right-color: transparent;
-  transform: rotate(45deg);
-  top: 4px;
-  left: 0;
-
+.byline {
+  font-size: 16px;
+  font-weight: bold;
+  margin-top: 8px;
+  color: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  text-shadow: none;
 }
 
 .img_container {
@@ -197,7 +291,7 @@ body {
   height: 100%;
   position: relative;
   background: center center no-repeat;
-  background-size: contain;
+  background-size: cover;
 }
 
 .text_container {
@@ -210,9 +304,10 @@ body {
   align-items: center;
   justify-content: center;
   display: flex;
-  font-size: 24px;
-  font-family:'Lilita One', cursive !important;
-  padding: 0 25%;
+  font-size: 20px;
+  padding: 0 20%;
+  word-spacing: 2px;
+  letter-spacing: 0.2px;
 }
 
 .wrapper {
@@ -220,71 +315,6 @@ body {
   padding: 8px;
   max-width: 1280px;
   margin: 0 auto;
-}
-
-.ai {
-  
-  color:#6ED3EA;
-}
-
-.chat {
-  width: 75%;
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 4px;
-  background: rgba(220, 220, 220, 0);
-  border-radius: 16px;
-  padding: 4px;
-  text-shadow: 1px 1px 0 #fff, -1px -1px 0 #fff, -1px 1px 0 #fff, 1px -1px 0 #fff;
-
-  color:#60D989;
-}
-
-.profile {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  
-}
-
-.ai .profile {
-  background: #6ED3EA;
-}
-
-.profile img {
-  width: 60%;
-  height: 60%;
-  object-fit: contain;
-}
-
-.message {
-  flex: 1;
-  margin: 4px 0 0 4px;
-  color: #000;
-  font-size: 20px;
-
-  max-width: 100%;
-  overflow-x: scroll;
-
-  /*
-   * white space refers to any spaces, tabs, or newline characters that are used to format the CSS code
-   * specifies how white space within an element should be handled. It is similar to the "pre" value, which tells the browser to treat all white space as significant and to preserve it exactly as it appears in the source code.
-   * The pre-wrap value allows the browser to wrap long lines of text onto multiple lines if necessary.
-   * The default value for the white-space property in CSS is "normal". This tells the browser to collapse multiple white space characters into a single space, and to wrap text onto multiple lines as needed to fit within its container.
-  */
-  white-space: pre-wrap; 
-
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-/* hides scrollbar */
-.message::-webkit-scrollbar {
-  display: none;
 }
 
 form {
@@ -310,20 +340,28 @@ textarea {
   width: 100%;
   color: #000;
   font-size: 18px;
-  background: #e8e8e8;
-  padding: 8px;
-  border-radius: 4px;
+  background: url(./assets/papertexture.png) #e8e8e8;
+  padding: 4px 16px;
+  border-radius: 1px;
   border: none;
   outline: none;
   flex-grow: 1;
   resize: none;
   position: relative;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  line-height: 32px;
+  color: #2F2E32;
+}
+
+textarea::placeholder {
+  color: #aeaeae;
 }
 
 label {
   position: relative;
   bottom: -8px;
+  word-spacing: 2px;
+  letter-spacing: 0.2px;
 }
 
 textarea#artstyle {
@@ -335,14 +373,17 @@ button {
   outline: 0;
   border: 0;
   cursor: pointer;
-  color: orange;
-  font-size: 48px;
+  color: #FF9737;
+  font-size: 40px;
   background: none;
-  font-family:'Lilita One', cursive !important;
+  font-weight: bold;
+  letter-spacing: 1px;
+  word-spacing: -6px;
+  font-family: 'Sigmar', -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
 }
 
 button:hover {
-  color: red;
+  color: #F83B21;
 }
 
 form img {
@@ -352,5 +393,8 @@ form img {
 
 form.disabled {
   pointer-events: none;
+}
+
+form.disabled textarea, form.disabled button, form.disabled label {
   opacity: .5;
 }
