@@ -1,5 +1,3 @@
-import storyText from './assets/sample_story';
-
 const form = document.querySelector('form');
 const cover = document.querySelector('#cover')
 const book = document.querySelector('#book');
