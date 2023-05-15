@@ -79,7 +79,7 @@ body, html {
   margin-top: 16px;
   padding-left: 16px;
   width: 100%;
-  overflow: scroll;
+  overflow: auto;
   flex-shrink: 0;
 }
 
@@ -115,7 +115,7 @@ body, html {
 #chat-body {
   height: 100%;
   padding: 8px 20px 32px 24px;
-  overflow: scroll;
+  overflow: auto;
   line-height: 1.5;
 
 }
@@ -199,7 +199,7 @@ body, html {
   height: 64px;
   background: white;
   display: flex;
-  position: fixed;
+  position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
