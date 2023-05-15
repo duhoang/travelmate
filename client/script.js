@@ -24,7 +24,7 @@ function typeText(element, text) {
       index++;
       chatBody.scrollTop = chatBody.scrollHeight;
     
-      shapeObject.style.height = `${chatBody.scrollHeight - 32}px`;
+      shapeObject.style.height = `${chatBody.scrollHeight - 96}px`;
     } else {
       clearInterval(interval);
     }
@@ -32,8 +32,8 @@ function typeText(element, text) {
 }
 
 const moveShapeObject = () => {
-  shapeObject.style.height = `${chatBody.scrollTop + contentBody.clientHeight - 32}px`;
-  blurBody.style.height = `${Math.min(chatBody.scrollTop + 32, contentBody.clientHeight) + 32}px`;
+  shapeObject.style.height = `${chatBody.scrollTop + contentBody.clientHeight - 96}px`;
+  blurBody.style.height = `${Math.min(chatBody.scrollTop + 32, contentBody.clientHeight) + 96}px`;
 }
 
 const locationFound = (position) => {

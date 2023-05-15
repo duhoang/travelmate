@@ -101,7 +101,8 @@ body {
 }
 
 #content-body {
-  height: calc(75% - 64px);
+  height: 75%;
+  padding-bottom: 64px;
   position: relative;
   flex-grow: 0;
   overflow: hidden;
@@ -123,7 +124,7 @@ body {
   height: 100px;
   border-radius: 100%;
   right: 16px;
-  bottom: 32px;
+  bottom: 96px;
   background: url(./assets/headshot.png) center center rgb(180, 180, 180);
   background-size: cover;
   border: 2px solid white;
@@ -196,6 +197,10 @@ body {
   height: 64px;
   background: white;
   display: flex;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
 }
 
 form {
