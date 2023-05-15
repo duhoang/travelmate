@@ -49,7 +49,8 @@ const talkToAssistant = async(prompt, callback) => {
 
   loader.style.display = "flex";
 
-  const response = await fetch('http://localhost:4000', {
+  const response = await fetch('https://travelmate-ai.onrender.com', {
+  //const response = await fetch('http://localhost:4000', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -67,7 +68,9 @@ const talkToAssistant = async(prompt, callback) => {
 }
 
 const getPhoto = async(prompt, elm, isPotrait = false) => {
-  const response = await fetch(`http://localhost:4000/${isPotrait ? "images" : "stablediff"}`, {
+  
+  const response = await fetch(`https://travelmate-ai.onrender.com/${isPotrait ? "images" : "stablediff"}`, {
+  //const response = await fetch(`http://localhost:4000/${isPotrait ? "images" : "stablediff"}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
