@@ -1,107 +1,73 @@
 const form = document.querySelector('form');
-const cover = document.querySelector('#cover')
-const book = document.querySelector('#book');
-const storySummary = document.querySelector('#prompt');
-const artStyle = document.querySelector('#artstyle');
-let paragraphs = [];
-let illustrations = [];
-let image2image = false;
-let prevImage = null;
+const chatBody = document.querySelector('#chat-body');
+const contentBody = document.querySelector('#content-body');
+let shapeObject = document.querySelector('#circle');
+const blurBody = document.querySelector('#body-blur');
+const cityName = document.querySelector('#city-name');
+const background = document.querySelector('#background');
+const tourguide = document.querySelector('#mate-photo');
+const loader = document.querySelector('.loader');
 
-const EX_STORY = "There was a bunny name Fred. Who lives on a farm and goes on adventures with his barnyard friends.";
+let currentCity = '';
+let currentPerson = '';
 
-const EX_ARTSTYLE = "Children's illustration, cartoony, colorful";
+const topics = ["What are some popular attractions in this area?", "What's good to eat around here?", "Can you recommend some nice hotels in the area?", "Where can I find some transportation nearby?"]
 
-storySummary.placeholder = `Ex. ${EX_STORY}`;
-artStyle.placeholder = `Ex. ${EX_ARTSTYLE}`;
+function typeText(element, text) {
+  let index = 0;
 
-const generatePreview = async(e) => {
-  
-  const data = new FormData(form);
+  let words = text.split(" ");
 
-  if (data.get('prompt') === "") 
-    storySummary.placeholder = `Ex. ${EX_STORY}`;
+  let interval = setInterval(() => {
+    if (index < words.length) {
+      element.innerHTML += `${words[index]} `;
+      index++;
+      chatBody.scrollTop = chatBody.scrollHeight;
+    
+      shapeObject.style.height = `${chatBody.scrollHeight - 32}px`;
+    } else {
+      clearInterval(interval);
+    }
+  }, 50)
+}
 
-  if (data.get('artstyle') === "")
-    artStyle.placeholder = `Ex. ${EX_ARTSTYLE}`;
+const moveShapeObject = () => {
+  shapeObject.style.height = `${chatBody.scrollTop + contentBody.clientHeight - 32}px`;
+  blurBody.style.height = `${Math.min(chatBody.scrollTop + 32, contentBody.clientHeight) + 32}px`;
+}
 
-  const promptString = `Write a concised visual description of an image that summarizes this story: ${data.get('prompt') || EX_STORY}. The visual description should only include physical characteristics of the characters and scene.`;
+const locationFound = (position) => {
+  const prompt = `What is the city or town at this latitude: ${position.coords.latitute} , and longitute: ${position.coords.longitude} ? Reply will only the name.`;
+  talkToAssistant(prompt, populateCity);
+}
 
+const locationDenied = (error) => {
+  console.log(error);
+}
 
+const talkToAssistant = async(prompt, callback) => {
 
-  const response = await fetch('https://create-a-story.onrender.com', {
-  //const response = await fetch('http://localhost:4000', {
+  loader.style.display = "flex";
+
+  const response = await fetch('http://localhost:4000', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      prompt: promptString
+      prompt: prompt
     })
   })
 
   if (response.ok) {
     const data = await response.json();
     const parsedData = data.bot.trim();
-    generateIllustration(parsedData, cover);
-  } else {
-    const err = await response.text();
-    console.log(err);
-  }
+    callback(parsedData);
+  } 
 }
 
-const handleSubmit = async(e) => {
-  e.preventDefault();
-  const data = new FormData(form);
-
-  if (data.get('prompt') === "")
-    return;
-
-  image2image = false;
-
-  form.classList.add("disabled");
-  
-  const storyPrompt = `write a short children story about ${data.get('prompt')}, and include one visual description for each paragraph. The visual descriptions should be labeled "Illustration:" and be concised and only include physical characteristics of the characters and the scene.`;
-
-  const response = await fetch('https://create-a-story.onrender.com', {
-  //const response = await fetch('http://localhost:4000', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      prompt: storyPrompt
-    })
-  })
-
-
-  if (response.ok) {
-    const data = await response.json();
-    const parsedData = data.bot.trim();
-    parseIntoBook(parsedData);
-
-    form.classList.remove("disabled");
-  } else {
-    const err = await response.text();
-    form.classList.remove("disabled");
-  }
-}
-
-form.addEventListener('submit', handleSubmit);
-form.addEventListener('keyup', (e)=>{
-  if (e.keyCode === 13) {
-    //generatePreview();
-  }
-})
-
-const generateIllustration = async(desc, elm) => {
-
-  const prompt = `${artStyle.value || EX_ARTSTYLE}. ${desc}`;
-
-  elm.getElementsByClassName('loading_gif')[0].style.display = "block";
-  
-  const response = await fetch(`https://create-a-story.onrender.com/stablediff${image2image ? 'img2img' : ''}`, {
-  //const response = await fetch(`http://localhost:4000/stablediff${image2image ? 'img2img' : ''}`, {
+const getPhoto = async(prompt, elm, isPotrait = false) => {
+  const response = await fetch(`http://localhost:4000/${isPotrait ? "images" : "stablediff"}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -114,102 +80,107 @@ const generateIllustration = async(desc, elm) => {
   if (response.ok) {
     const data = await response.json();
 
-    image2image = true;
-
-    elm.getElementsByClassName('loading_gif')[0].style.display = "none";
-    
-    elm.getElementsByClassName('img_container')[0].style.backgroundImage=`url(data:image/png;base64,${data.images.artifacts[0].base64})`;
-  }
-}
-
-const parseIntoBook = (txt) => {
-  let separateContent = txt.split('\n\n').filter((p) => { return p.length; });
-  paragraphs = [];
-  illustrations = []
-
-  separateContent.forEach((p) => {
-    let temp = p.trim().split('Illustration:');
-    paragraphs.push(temp[0]);
-    illustrations.push(temp[1]);
-  });
-
-  createBook(paragraphs, illustrations);
-}
-
-const createBook = (paragraphs, illustrations) => {
- 
-  book.innerHTML = "";
-
-  book.classList.remove("hide-book");
-
-  const maxlength = Math.min(paragraphs.length, illustrations.length);
-  
-  for (let i = 0; i < maxlength; i++) {
-    book.innerHTML += createSpread(paragraphs[i], i, maxlength);
-  }
-  const nextBtns = document.getElementsByClassName("nav_btn");
-
-  [].forEach.call(nextBtns, (elm) => {
-    elm.addEventListener("click", onClickNav);
-  });
-
-  showSpread("0");
-}
-
-const createSpread = (txt, index, maxlength) => {
-  return (
-    `
-      <div class="spread" data-index="${index}">
-        <div class="page">
-            <div class="text_container">
-              ${txt}
-            </div>
-            ${getBackButton(index)}
-          </div>
-          <div class="page">
-              <div class="img_container">
-                <div class="loading_gif"></div>
-              </div>
-
-            ${getNextButton(index, maxlength)}
-          </div>
-      </div>
-    `
-  )
-}
-
-const getBackButton = (index) => {
-  if (index <= 0 ) return "";
-  return `<div class="back_btn nav_btn" data-index="${index-1}">← Back</div>`;
-}
-
-const getNextButton = (index, maxlength) => {
-  if (index == maxlength - 1)
-    return `<div class="next_btn nav_btn" data-index="${-1}">Retry ↺</div>`;
-  return `<div class="next_btn nav_btn" data-index="${index+1}">Next →</div>`;
-}
-
-const onClickNav = (ev) => {
-  showSpread(ev.target.getAttribute("data-index"));
-}
-
-const showSpread = (index) => {
-
-  if (index==="-1") {
-    book.classList.add("hide-book");
-    form.classList.remove("disabled");
-    return;
-  };
-
-  const spreads = document.getElementsByClassName("spread");
-
-  [].forEach.call(spreads, (elm) => {
-    elm.style.display = parseInt(elm.getAttribute("data-index")) <= parseInt(index) ? "flex" : "none";
-    if (elm.getAttribute("data-index") === index && elm.getElementsByClassName('img_container')[0].style.backgroundImage === "") {
-      generateIllustration(illustrations[index], elm);
+    const isPortrait = !!(data && data.image); 
+    if (isPortrait) {
+      elm.style.backgroundImage = `url(${data.image.data[0].url})`;
+    } else {
+      elm.style.backgroundImage = `url(data:image/png;base64,${data.images.artifacts[0].base64})`;
     }
-  })
-  
+  }
 }
 
-generatePreview();
+const populateCity = (city) => {
+  cityName.innerHTML = city;
+
+  currentCity = city;
+
+  const str = city.split(" ");
+
+  let index = str.reduce((acc, curr, i)=>{
+      if(curr.length > str[acc].length){
+      return i
+      }
+      return acc;
+  }, 0)
+
+  if (city.length > 24 || str[index] > 12) {
+    cityName.classList.add("small-text");
+  } else {
+    cityName.classList.remove("small-text");
+  }
+
+  const photoPrompt = `A beautiful, picturesque, editorial photograph of this travel desination: ${city}`;
+  getPhoto(photoPrompt, background);
+
+  const prompt = `Give me the name of a famous person from ${city}. Reply with only their name.`
+  talkToAssistant(prompt, createTourGuide);
+}
+
+const startChat = (txt) => {
+
+  let p = document.createElement('p');
+  chatBody.appendChild(p);
+
+  loader.style.display = "none";
+  typeText(p, txt);
+}
+
+const createBubble = (txt) => {
+  let p = document.createElement('p');
+  chatBody.appendChild(p);
+  p.classList.add('question');
+  p.innerHTML = txt;
+  chatBody.scrollTop = chatBody.scrollHeight;
+  shapeObject.style.height = `${chatBody.scrollHeight - 32}px`;
+}
+
+const askTopics = (index) => {
+  console.log(topics[index]);
+  createBubble(topics[index]);
+  talkToAssistant(`${topics[index]}. Give your answer with ${currentCity} as your context. And reply as if you are ${currentPerson}`, startChat);
+}
+
+const createTourGuide = (name) => {
+
+  currentPerson = name;
+  const photoPrompt = `${name}, photograph, portrait, color`;
+  getPhoto(photoPrompt, tourguide, true);
+
+  const prompt = `Introduce yourself to the user as if you are ${name}.  And talk about who you are and your connection to ${currentCity}. And welcome the user to ${currentCity}. Then ask them if they have any questions about ${currentCity} for you.`
+  talkToAssistant(prompt, startChat);
+}
+
+const handleSubmit = async(e) => {
+  e.preventDefault();
+  const data = new FormData(form);
+
+
+  const prompt = data.get('prompt');
+
+  if (prompt=== "")
+    return;
+  
+  talkToAssistant(`${prompt}. Give your answer with ${currentCity} as your context. And reply as if you are ${currentPerson}`, startChat);
+
+  document.getElementById("prompt").value = "";
+
+  createBubble(prompt);
+}
+
+
+
+
+
+navigator.geolocation.getCurrentPosition(locationFound, locationDenied);
+chatBody.addEventListener("scroll", moveShapeObject);
+
+form.addEventListener('submit', handleSubmit);
+form.addEventListener('keyup', (e)=>{
+  if (e.keyCode === 13) {
+    handleSubmit(e);
+  }
+})
+
+document.querySelectorAll('.topic').forEach(function(node, index) {
+  node.addEventListener("click", () => {askTopics(index)});
+});
