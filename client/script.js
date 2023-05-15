@@ -23,8 +23,7 @@ function typeText(element, text) {
       element.innerHTML += `${words[index]} `;
       index++;
       chatBody.scrollTop = chatBody.scrollHeight;
-    
-      shapeObject.style.height = `${chatBody.scrollHeight - 96}px`;
+      shapeObject.style.height = `${chatBody.scrollHeight - 64}px`;
     } else {
       clearInterval(interval);
     }
