@@ -13,7 +13,7 @@ let currentPerson = '';
 
 const topics = ["What are some popular attractions in this area?", "What's good to eat around here?", "Can you recommend some nice hotels in the area?", "Where can I find some transportation nearby?"]
 
-function typeText(element, text) {
+function typeText(element, text, callback = ()=>{}) {
   let index = 0;
 
   let words = text.split(" ");
@@ -26,6 +26,7 @@ function typeText(element, text) {
       shapeObject.style.height = `${chatBody.scrollHeight - 64}px`;
     } else {
       clearInterval(interval);
+      callback();
     }
   }, 50)
 }
@@ -118,13 +119,65 @@ const populateCity = (city) => {
   talkToAssistant(prompt, createTourGuide);
 }
 
+let chatIndex;
+let sentences;
+
 const startChat = (txt) => {
 
-  let p = document.createElement('p');
-  chatBody.appendChild(p);
-
   loader.style.display = "none";
-  typeText(p, txt);
+
+  sentences = txt.split('\n');
+
+  chatIndex = 0;
+
+  chatFormat();
+}
+
+const formatRec = (txt) => {
+  let a = document.createElement('a');
+  chatBody.appendChild(a);
+  let textLink = txt.split("http");
+  a.innerHTML += textLink[0].replace("*", "");
+  a.href = `http${textLink[1]}`;
+  a.target = "_blank";
+  a.classList.add('chat-link');
+  let image = document.createElement('span');
+  a.prepend(image);
+
+  getPhoto(textLink[0].replace("*", ""), image);
+
+  chatBody.scrollTop = chatBody.scrollHeight;
+  shapeObject.style.height = `${chatBody.scrollHeight - 32}px`;
+
+  let interval = setInterval(() => {
+    chatFormat();
+    clearInterval(interval);
+  }, 30);
+}
+
+const chatFormat = () => {
+
+  if (chatIndex >= sentences.length)
+    return;
+
+  sentences[chatIndex].trim();
+
+  if (sentences[chatIndex].length > 0) {
+
+    if (sentences[chatIndex].includes('http') && sentences[chatIndex].includes('*')) {
+      formatRec(sentences[chatIndex])
+    } else {
+      let p = document.createElement('p');
+      chatBody.appendChild(p);
+      typeText(p, sentences[chatIndex], chatFormat);
+    }
+    
+    chatIndex++;
+  } else {
+
+    chatIndex++;
+    chatFormat();
+  }
 }
 
 const createBubble = (txt) => {
@@ -136,10 +189,15 @@ const createBubble = (txt) => {
   shapeObject.style.height = `${chatBody.scrollHeight - 32}px`;
 }
 
+const questionFormat = (txt) => {
+  const context = `Give your answer with ${currentCity} as your context. And reply as if you are ${currentPerson}`;
+  const format = `For any recommendations, each recommendation on a new line with a "*" at the beginning, then the name, and their website URL. And follow by a friendly banter in a separate paragraph.`;
+  talkToAssistant(`${txt}. ${context}. ${format}`, startChat);
+}
+
 const askTopics = (index) => {
-  console.log(topics[index]);
   createBubble(topics[index]);
-  talkToAssistant(`${topics[index]}. Give your answer with ${currentCity} as your context. And reply as if you are ${currentPerson}`, startChat);
+  questionFormat(topics[index]);
 }
 
 const createTourGuide = (name) => {
@@ -165,7 +223,7 @@ const handleSubmit = async(e) => {
   if (prompt=== "")
     return;
   
-  talkToAssistant(`${prompt}. Give your answer with ${currentCity} as your context. And reply as if you are ${currentPerson}`, startChat);
+  questionFormat(prompt);
 
   document.getElementById("prompt").value = "";
 

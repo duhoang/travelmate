@@ -63,7 +63,7 @@ body, html {
 }
 
 #city-name {
-  font-size: 64px;
+  font-size: 56px;
   flex-grow: 1;
   display: flex;
   align-items: flex-end;
@@ -71,7 +71,7 @@ body, html {
 }
 
 #city-name.small-text {
-  font-size: 48px;
+  font-size: 40px;
 }
 
 #topics {
@@ -174,6 +174,32 @@ body, html {
   display: inline-block;
   height: 100%;
   width: 200px;
+}
+
+a.chat-link {
+  display: block;
+  margin: 32px 114px 24px 0 !important;
+  background: #008BDA;
+  font-weight: bold;
+  color: white;
+  text-decoration: none;
+  border-radius: 16px;
+  padding: 16px;
+  font-size: 14px;
+}
+
+a.chat-link:active, a.chat-link:visited {
+  color: white;
+}
+
+a.chat-link span {
+  display: block;
+  width: 100%;
+  padding-top: 100%;
+  border-radius: 2px;
+  background: rgb(180, 180, 180);
+  border: white 1px solid;
+  margin: 4px 0 16px;
 }
 
 .question {
@@ -300,4 +326,17 @@ form img {
   100% {
     transform: translateY(0);
   }
+}
+
+#byline a {
+  position: absolute;
+  top: 8px;
+  right: 16px;
+  font-size: 14px;
+  text-decoration: none;
+  font-weight: normal;
+}
+
+#byline a:active, #byline a:visited {
+  color: white;
 }
