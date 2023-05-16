@@ -81,6 +81,7 @@ body, html {
   width: 100%;
   overflow: auto;
   flex-shrink: 0;
+  height: 32px;
 }
 
 .topic {
@@ -127,9 +128,23 @@ body, html {
   border-radius: 100%;
   right: 16px;
   bottom: 96px;
-  background: url(./assets/headshot.png) center center rgb(180, 180, 180);
+  background: center center rgb(180, 180, 180);
   background-size: cover;
   border: 2px solid white;
+  animation: popIn 2s;
+}
+
+
+@keyframes popIn {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(0);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 #body-blur {
@@ -221,19 +236,12 @@ textarea {
   outline: none;
   font-family: -apple-system,system-ui,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   font-size: 16px;
-  padding: 8px;
-}
-
-textarea {
-  width: 100%;
-  color: #000;
-  font-size: 16px;
-  padding: 8px;
+  padding: 12px 8px;
   background: transparent;
   border-radius: 5px;
-  border: none;
   outline: none;
   flex-grow: 2;
+  margin-right: 48px;
 }
 
 button {
@@ -241,6 +249,10 @@ button {
   border: 0;
   cursor: pointer;
   background: transparent;
+  position: absolute;
+  right: 0;
+  width: 48px;
+  height: 48px;
 }
 
 form img {

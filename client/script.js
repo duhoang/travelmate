@@ -150,6 +150,9 @@ const createTourGuide = (name) => {
 
   const prompt = `Introduce yourself to the user as if you are ${name}.  And talk about who you are and your connection to ${currentCity}. And welcome the user to ${currentCity}. Then ask them if they have any questions about ${currentCity} for you.`
   talkToAssistant(prompt, startChat);
+
+  tourguide.classList.add('showMate');
+  
 }
 
 const handleSubmit = async(e) => {
