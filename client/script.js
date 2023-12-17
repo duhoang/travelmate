@@ -69,7 +69,7 @@ const talkToAssistant = async(prompt, callback) => {
 
 const getPhoto = async(prompt, elm, isPotrait = false) => {
   
-  const response = await fetch(`https://travelmate-ai.onrender.com/${isPotrait ? "images" : "stablediff"}`, {
+  const response = await fetch('https://travelmate-ai.onrender.com/images', {
   //const response = await fetch(`http://localhost:4000/${isPotrait ? "images" : "stablediff"}`, {
     method: 'POST',
     headers: {
